@@ -1,0 +1,6 @@
+# PoP Requirements
+torch
+transformers
+numpy
+pandas
+scikit-learn
