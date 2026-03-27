@@ -1,0 +1,50 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# === Virtual environments ===
+venv/
+.venv/
+env/
+
+# === Model weights & training artifacts ===
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+*.pkl
+*.pickle
+*.joblib
+models/
+checkpoints/
+outputs/
+runs/
+wandb/
+
+# === Jupyter / Colab ===
+.ipynb_checkpoints/
+*.nbconvert.*
+
+# === Data (too large for git) ===
+data/
+*.csv
+*.parquet
+*.h5
+*.hdf5
+
+# === OS junk ===
+.DS_Store
+Thumbs.db
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Environment / secrets ===
+.env
+.env.*
