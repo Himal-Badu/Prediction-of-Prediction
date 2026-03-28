@@ -81,6 +81,7 @@ jobs:
           # Test 5: PoP v2 model
           model_v2_wrapper = PoPLayerLLMV2(vocab_size=50257, device='cpu')
           model_v2 = model_v2_wrapper.model
+          model_v2.eval()
           logits_v2 = torch.randn(1, 50257)
           probs_v2 = torch.softmax(logits_v2, dim=-1)
           out_v2 = model_v2(logits_v2, probs_v2)
