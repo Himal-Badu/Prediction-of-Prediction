@@ -57,7 +57,7 @@ jobs:
           # Test 1: Import all modules
           from pop.core.llm_base import LLMBase
           from pop.core.pop_layer_llm import PoPLayerLLM, LLMErrorPredictor
-          from pop.core.pop_v2 import PoPLayerV2
+          from pop.core.pop_v2 import PoPLayerLLMV2
           from pop.core.integration import PoPIntegration
           print('✓ All imports successful')
           
@@ -79,7 +79,8 @@ jobs:
           print('✓ Feature extraction works (16 features)')
           
           # Test 5: PoP v2 model
-          model_v2 = PoPLayerV2(input_dim=24, hidden_dim=512, num_residual_blocks=3)
+          model_v2_wrapper = PoPLayerLLMV2(vocab_size=50257, device='cpu')
+          model_v2 = model_v2_wrapper.model
           feat_v2 = torch.randn(1, 24)
           out_v2 = model_v2(feat_v2)
           assert 'error_magnitude' in out_v2
