@@ -48,3 +48,6 @@ Thumbs.db
 # === Environment / secrets ===
 .env
 .env.*
+
+# === Generated ===
+pop_debug_log.json

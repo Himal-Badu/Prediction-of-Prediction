@@ -46,6 +46,9 @@ class LLMErrorPredictor(nn.Module):
         # We'll dynamically compute features from full distribution
         input_dim = 16  # Features extracted from distribution
         
+        # Normalize features to same scale
+        self.feature_norm = nn.LayerNorm(input_dim)
+        
         layers = []
         for i in range(num_layers):
             if i == 0:
@@ -145,8 +148,8 @@ class LLMErrorPredictor(nn.Module):
             gini = (2 * torch.sum((torch.arange(1, n + 1, device=logits.device).float() * sorted_desc)) - (n + 1) * cumsum[-1]) / (n * cumsum[-1] + 1e-10)
             feat.append(gini.unsqueeze(-1))
             
-            # Max/min ratio
-            max_min_ratio = top1_prob / (torch.min(prob_slice) + 1e-10)
+            # Max/min ratio (log-scaled to prevent explosion)
+            max_min_ratio = torch.log(top1_prob + 1e-10) - torch.log(torch.min(prob_slice) + 1e-10)
             feat.append(max_min_ratio.unsqueeze(-1))
             
             # Log-sum-exp (partition function)
@@ -169,6 +172,7 @@ class LLMErrorPredictor(nn.Module):
             Dictionary with predictions
         """
         features = self.extract_features(logits, probs)
+        features = self.feature_norm(features)
         hidden = self.hidden(features)
         
         error_magnitude = torch.sigmoid(self.error_head(hidden)).squeeze(-1)
@@ -186,7 +190,8 @@ class LLMErrorPredictor(nn.Module):
 @dataclass
 class TrainingExample:
     """Training example for PoP layer."""
-    features: torch.Tensor
+    logits: torch.Tensor       # Raw LLM logits (vocab_size,)
+    probs: torch.Tensor        # LLM probability distribution (vocab_size,)
     error_magnitude: float  # 0-1: how wrong the LLM was
     confidence: float  # 0-1: how confident the LLM actually was
     error_direction: float  # -1 to 1: over/under estimate
@@ -291,6 +296,7 @@ class PoPLayerLLM:
         )
         
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
         self.optimizer.step()
         
         self.is_trained = True
@@ -322,10 +328,7 @@ class PoPLayerLLM:
             for ex in examples:
                 self.optimizer.zero_grad()
                 
-                outputs = self.model(ex.features.unsqueeze(0), ex.features.unsqueeze(0))
-                
-                # Need to reconstruct features from stored values
-                # For now, use stored labels
+                outputs = self.model(ex.logits.unsqueeze(0), ex.probs.unsqueeze(0))
                 loss = (
                     self.criterion(outputs["error_magnitude"], torch.tensor([ex.error_magnitude], device=self.device)) +
                     self.criterion(outputs["confidence"], torch.tensor([ex.confidence], device=self.device)) +
@@ -333,6 +336,7 @@ class PoPLayerLLM:
                 )
                 
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
                 self.optimizer.step()
                 
                 total_loss += loss.item()
