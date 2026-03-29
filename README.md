@@ -7,7 +7,7 @@ PoP achieves **83.3% error detection precision** on DistilGPT-2, catching halluc
 [![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/-PyTorch-EE4C2C?style=flat&logo=pytorch)](https://pytorch.org/)
 [![HuggingFace](https://img.shields.io/badge/-HuggingFace-FFAE00?style=flat&logo=huggingface)](https://huggingface.co/)
-[![License](https://img.shields.io/badge/-License-MIT-orange?style=flat)](LICENSE)
+[![License](https://img.shields.io/badge/-License-AGPL--3.0-orange?style=flat)](LICENSE)
 
 ---
 
@@ -297,7 +297,9 @@ Please open an issue before starting large changes so we can coordinate.
 
 ## License
 
-MIT License — see [LICENSE](LICENSE)
+AGPL-3.0 License — see [LICENSE](LICENSE)
+
+If you use PoP over a network (API, SaaS), you must share your source code. For commercial licensing, contact us.
 
 ---
 
