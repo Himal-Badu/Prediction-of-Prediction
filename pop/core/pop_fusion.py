@@ -137,9 +137,9 @@ class PoPFusion:
             r2 = self.v2.predict(logits, probs)
 
             combined = {
-                "error_magnitude": alpha * r1["error_magnitude"] + (1 - alpha) * r2["error_magnitude"],
-                "confidence": alpha * r1["confidence"] + (1 - alpha) * r2["confidence"],
-                "error_direction": alpha * r1["error_direction"] + (1 - alpha) * r2["error_direction"],
+                "error_magnitude": float(alpha * r1["error_magnitude"] + (1 - alpha) * r2["error_magnitude"]),
+                "confidence": float(alpha * r1["confidence"] + (1 - alpha) * r2["confidence"]),
+                "error_direction": float(alpha * r1["error_direction"] + (1 - alpha) * r2["error_direction"]),
             }
 
             # Decision logic: correct if either specialist flags a problem

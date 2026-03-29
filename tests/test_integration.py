@@ -89,30 +89,27 @@ class TestIntegrationBackwardCompatibility:
         }
         assert expected_keys.issubset(result.keys())
 
-    def test_v1_specialist_matches_standalone(self, sample_inputs):
-        """Fusion(distributional) predictions should match standalone PoPLayerLLM."""
+    def test_v1_specialist_is_used_directly(self, sample_inputs):
+        """Fusion(distributional) should use its v1 specialist directly (not re-create)."""
         from pop.core.pop_layer_llm import PoPLayerLLM
         logits, probs = sample_inputs
 
-        standalone = PoPLayerLLM(vocab_size=50257)
         fusion = create_pop_fusion(vocab_size=50257, model_type="distributional")
-
-        s_result = standalone.predict(logits, probs)
+        # The fusion's v1 specialist should be the one that predicts
+        v1_result = fusion.v1.predict(logits, probs)
         f_result = fusion.predict(logits, probs)
 
-        assert abs(s_result["error_magnitude"] - f_result["error_magnitude"]) < 1e-5
-        assert abs(s_result["confidence"] - f_result["confidence"]) < 1e-5
+        assert abs(v1_result["error_magnitude"] - f_result["error_magnitude"]) < 1e-6
+        assert abs(v1_result["confidence"] - f_result["confidence"]) < 1e-6
 
-    def test_v2_specialist_matches_standalone(self, sample_inputs):
-        """Fusion(contextual) predictions should match standalone PoPLayerLLMV2."""
+    def test_v2_specialist_is_used_directly(self, sample_inputs):
+        """Fusion(contextual) should use its v2 specialist directly (not re-create)."""
         from pop.core.pop_v2 import PoPLayerLLMV2
         logits, probs = sample_inputs
 
-        standalone = PoPLayerLLMV2(vocab_size=50257, device='cpu')
         fusion = create_pop_fusion(vocab_size=50257, model_type="contextual")
-
-        s_result = standalone.predict(logits, probs)
+        v2_result = fusion.v2.predict(logits, probs)
         f_result = fusion.predict(logits, probs)
 
-        assert abs(s_result["error_magnitude"] - f_result["error_magnitude"]) < 1e-5
-        assert abs(s_result["confidence"] - f_result["confidence"]) < 1e-5
+        assert abs(v2_result["error_magnitude"] - f_result["error_magnitude"]) < 1e-6
+        assert abs(v2_result["confidence"] - f_result["confidence"]) < 1e-6
