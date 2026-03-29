@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/-PyTorch-EE4C2C?style=flat&logo=pytorch)](https://pytorch.org/)
 [![HuggingFace](https://img.shields.io/badge/-HuggingFace-FFAE00?style=flat&logo=huggingface)](https://huggingface.co/)
-[![License](https://img.shields.io/badge/-License-MIT-orange?style=flat)](LICENSE)
+[![License](https://img.shields.io/badge/-License-AGPL--3.0-orange?style=flat)](LICENSE)
 
 *Your LLM's supervisor — predicting predictions to make AI better.*
 
@@ -207,7 +207,9 @@ PoP is the first step toward **self-aware AI** — systems that can evaluate the
 
 ## License
 
-MIT License — see [LICENSE](LICENSE)
+AGPL-3.0 License — see [LICENSE](LICENSE)
+
+If you use PoP over a network (API, SaaS), you must share your source code. For commercial licensing, contact us.
 
 ---
 
