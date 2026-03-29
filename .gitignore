@@ -51,3 +51,6 @@ Thumbs.db
 
 # === Generated ===
 pop_debug_log.json
+# Private research docs (not for GitHub)
+docs/RESEARCH_RECOMMENDATIONS.md
+marketing/

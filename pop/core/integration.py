@@ -3,10 +3,11 @@ Integration module - Combines LLM with PoP layer.
 Implements the safety guard: only adjusts if proven better.
 Includes debugger for full observability.
 
-Supports three model types via config:
+Supports four model types via config:
     - "distributional": PoP v1 (simple features, fast)
     - "contextual": PoP v2 (residual blocks, expanded features)
     - "fusion": Both specialists combined (best accuracy)
+    - "cross-attention": Cross-attention expert fusion with adaptive routing (experimental)
 """
 import torch
 import numpy as np
@@ -18,13 +19,14 @@ from .llm_base import LLMBase, create_llm
 from .pop_layer_llm import PoPLayerLLM, create_pop_llm
 from .pop_v2 import PoPLayerLLMV2, create_pop_v2
 from .pop_fusion import PoPFusion, FusionConfig, create_pop_fusion
+from .pop_cross_attention import PoPCrossAttentionFusion, create_pop_cross_attention_fusion
 from .debugger import PoPDebugger
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Valid model types
-MODEL_TYPES = ("distributional", "contextual", "fusion")
+MODEL_TYPES = ("distributional", "contextual", "fusion", "cross-attention")
 
 
 @dataclass
@@ -55,13 +57,13 @@ def _create_pop_layer(
     Factory: create the right PoP specialist or fusion layer.
     
     Args:
-        model_type: "distributional", "contextual", or "fusion"
+        model_type: "distributional", "contextual", "fusion", or "cross-attention"
         vocab_size: LLM vocabulary size
         device: torch device string
         fusion_config: Optional FusionConfig (only used when model_type="fusion")
     
     Returns:
-        PoPLayerLLM, PoPLayerLLMV2, or PoPFusion instance
+        PoPLayerLLM, PoPLayerLLMV2, PoPFusion, or PoPCrossAttentionFusion instance
     """
     if model_type == "distributional":
         return create_pop_llm(vocab_size=vocab_size, device=device)
@@ -70,6 +72,8 @@ def _create_pop_layer(
     elif model_type == "fusion":
         config = fusion_config or FusionConfig()
         return create_pop_fusion(vocab_size=vocab_size, device=device, config=config)
+    elif model_type == "cross-attention":
+        return create_pop_cross_attention_fusion(vocab_size=vocab_size, device=device)
     else:
         raise ValueError(
             f"Unknown model_type '{model_type}'. "
@@ -81,10 +85,11 @@ class PoPIntegration:
     """
     Integration of LLM + PoP layer with safety guard.
     
-    Supports three model types:
+    Supports four model types:
     - "distributional" (default): PoP v1 — simple features, fast inference
     - "contextual": PoP v2 — residual blocks, expanded feature set, better accuracy
     - "fusion": Combines both specialists for best results
+    - "cross-attention": Bidirectional expert fusion with adaptive routing (experimental)
     
     Modes:
     - "passive": PoP warns but never overrides LLM (log-only)
