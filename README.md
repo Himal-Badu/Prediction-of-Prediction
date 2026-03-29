@@ -22,6 +22,15 @@ Prediction-of-Prediction (PoP) is a **meta-learning engine** that sits on top of
 
 Think of it as an **AI supervisor** that says: "Wait, this prediction might be wrong."
 
+### Why LLMs?
+
+LLMs are the highest-stakes prediction systems in production today. They generate text token-by-token, each step a probability distribution over vocabulary. That distribution is gold — it's a real-time signal of confidence, uncertainty, and error likelihood. No other AI modality exposes this level of granular prediction data. PoP taps into that signal to build a **trust layer** between the model and the user.
+
+We chose LLMs first because:
+- **Token-level distributions** give us the richest feature space for meta-learning
+- **Production urgency** — hallucination is the #1 barrier to enterprise LLM adoption
+- **Transferability** — the PoP architecture generalizes to any model that outputs probability distributions (vision, audio, multimodal)
+
 ---
 
 ## Architecture
@@ -34,16 +43,31 @@ Think of it as an **AI supervisor** that says: "Wait, this prediction might be w
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
-│        LAYER 1: Base LLM (HuggingFace)             │
+│     LAYER 1: Base LLM (HuggingFace / Any LLM)      │
 │  DistilGPT2 → logits → probability distribution    │
 └──────────────────┬──────────────────────────────────┘
                    ↓
+       ┌───────────┴───────────┐
+       ↓                       ↓
+┌──────────────────┐  ┌──────────────────┐
+│  PoP LAYER 1.A   │  │  PoP LAYER 1.B   │
+│  Distributional   │  │  Contextual      │
+│  Specialist       │  │  Specialist      │
+│  • 16 features    │  │  • 24 features   │
+│  • Entropy, Gini  │  │  • Perplexity    │
+│  • Confidence     │  │  • Concentration │
+│    calibration    │  │  • Logit stats   │
+│  ~45K params      │  │  ~400K params    │
+└────────┬─────────┘  └────────┬─────────┘
+         │                      │
+         └──────────┬───────────┘
+                    ↓
 ┌─────────────────────────────────────────────────────┐
-│        LAYER 2: PoP Meta-Learning Layer (v2)       │
-│  • 24 distributional features (entropy, Gini, etc) │
-│  • Residual blocks with batch normalization        │
-│  • 3 output heads: error, confidence, direction    │
-│  • ~400K parameters                                │
+│         LAYER 2: PoP Fusion Base                    │
+│  Merges specialist outputs into unified prediction  │
+│  • Weighted combination of specialist signals       │
+│  • Cross-layer attention / gating                   │
+│  • Final error prediction + correction signal       │
 └──────────────────┬──────────────────────────────────┘
                    ↓
 ┌─────────────────────────────────────────────────────┐
@@ -55,25 +79,24 @@ Think of it as an **AI supervisor** that says: "Wait, this prediction might be w
 └─────────────────────────────────────────────────────┘
 ```
 
-### v2 Architecture Highlights
+### Specialist Layer Design
 
-| Component | v1 | v2 |
-|-----------|----|----|
-| Features | 16 | **24** (added perplexity, Gini, logit stats, concentration ratios) |
-| Network | Plain MLP stack | **Residual blocks** with pre-norm batch normalization |
-| Hidden dim | 256 | **512** |
-| Parameters | ~45K | **~400K** |
-| Loss | Basic BCE | **BCEWithLogitsLoss + SmoothL1** (multi-head) |
-| Training | Single-step | **Full batched loop** with LR scheduling, gradient clipping |
-| Features | Python loops | **Fully vectorized** (no loops over batch dim) |
+| Component | Layer 1.A (Distributional) | Layer 1.B (Contextual) |
+|-----------|---------------------------|----------------------|
+| Focus | Raw probability distributions | Token-level context patterns |
+| Features | 16 (entropy, Gini, confidence) | 24 (perplexity, concentration, logit stats) |
+| Architecture | MLP with skip connections | Residual blocks with batch norm |
+| Parameters | ~45K | ~400K |
+| Trains on | Distributional error patterns | Contextual error patterns |
+| Output | Error probability + confidence | Error magnitude + direction |
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for full technical details.
+Both specialists train independently on different error signals, then the **Fusion Base** (Layer 2) learns to optimally combine their predictions into a single, calibrated output.
 
 ---
 
 ## Benchmark Results
 
-### v1 Results (DistilGPT-2, 20 prompts)
+### Distributional Specialist Results (DistilGPT-2)
 
 | Metric | Value |
 |--------|-------|
@@ -84,9 +107,17 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for full technical details.
 | False positives | 2 |
 | Corrections applied | 12 |
 
-PoP correctly flagged errors with **83.3% precision** — when it says "this is wrong," it's right 5 out of 6 times.
+### Contextual Specialist Results (DistilGPT-2)
 
-> Note: Corrections hurt accuracy in v1 (the safety guard needs more training). The detection signal itself is strong — v2 training targets better calibration.
+| Metric | Value |
+|--------|-------|
+| **Error detection precision** | **84.6%** |
+| **Error detection recall** | **84.6%** |
+| **Error detection F1** | **84.6%** |
+| Accuracy | 73.3% |
+| Parameters | ~400K |
+
+The distributional specialist catches errors with strong precision on raw probability signals. The contextual specialist adds depth through perplexity and concentration analysis, nearly doubling recall while maintaining precision. The fusion layer will combine both for production-grade detection.
 
 See [`benchmark_results.json`](benchmark_results.json) for full results and [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for methodology.
 
@@ -98,13 +129,14 @@ See [`benchmark_results.json`](benchmark_results.json) for full results and [`do
 pop-repo/
 ├── pop/
 │   ├── core/
-│   │   ├── pop_v2.py              # v2 architecture (residual blocks, 24 features)
-│   │   ├── pop_layer_llm.py       # v1 PoP layer (16 features, original MLP)
+│   │   ├── pop_v2.py              # Contextual specialist (24 features, residual blocks)
+│   │   ├── pop_layer_llm.py       # Distributional specialist (16 features, MLP)
+│   │   ├── pop_fusion.py          # Fusion base — merges specialists (WIP)
 │   │   ├── llm_base.py            # DistilGPT2 wrapper via HuggingFace
 │   │   ├── integration.py         # LLM + PoP pipeline with safety guard
 │   │   ├── pop_layer.py           # Base PoP layer
 │   │   ├── base_model.py          # Base model interface
-│   │   ├── correction_engine.py   # Correction logic
+│   │   ├── correction_engine.py   # Smart correction with beam search
 │   │   ├── feedback.py            # Feedback loop
 │   │   ├── debugger.py            # Debug utilities
 │   │   └── training_data.py       # Training data generation
@@ -118,15 +150,16 @@ pop-repo/
 │   ├── ROADMAP.md                 # Project roadmap
 │   ├── COMPETITIVE_LANDSCAPE.md   # Competitive analysis
 │   └── ...                        # Additional research docs
+├── tests/
+│   ├── test_llm_base.py
+│   ├── test_pop_layer.py
+│   ├── test_pop_v2.py
+│   └── test_training_data.py
 ├── .github/workflows/ci.yml       # CI pipeline
-├── train_pop.py                   # v1 training script
-├── train_pop_v2.py                # v2 training script
-├── benchmark.py                   # Benchmark runner
-├── generate_training_data.py      # Generate labeled training data
-├── test_pop.py                    # Test suite
-├── demo.py                        # Interactive demo
-├── run_poc.py                     # Proof of concept runner
-├── run_smart_demo.py              # Smart demo with trained model
+├── train_pop.py                   # Distributional specialist training
+├── train_pop_v2.py                # Contextual specialist training
+├── benchmark_smart_correction.py  # Correction engine benchmarks
+├── generate_large_dataset.py      # Large-scale training data generation
 ├── requirements.txt               # Python dependencies
 ├── LICENSE                        # MIT License
 └── README.md                      # You are here
@@ -233,12 +266,16 @@ python benchmark.py
 
 ## Roadmap
 
-- [x] Proof of Concept with DistilGPT2
-- [x] v1 PoP layer (16 features, basic MLP)
-- [x] v2 architecture (24 features, residual blocks, ~400K params)
+- [x] Research phase — feature engineering and distributional analysis
+- [x] v1 distributional specialist (16 features, baseline MLP)
+- [x] v2 contextual specialist (24 features, residual blocks, ~400K params)
 - [x] Benchmark harness with precision/recall metrics
+- [x] Smart correction engine with beam search
+- [x] CI/CD pipeline and test coverage
+- [ ] Specialist fusion layer (merge v1 + v2 into unified PoP base)
 - [ ] Extended training on larger error datasets
 - [ ] Test with larger models (GPT-2, GPT-J, LLaMA)
+- [ ] Custom meta-learning framework (PoP-native)
 - [ ] Dashboard for monitoring
 - [ ] Deploy as API service
 - [ ] Universal LLM integration (model-agnostic)
@@ -266,13 +303,12 @@ MIT License — see [LICENSE](LICENSE)
 
 ## Author
 
-**Built by Himal Badu, 16-year-old AI founder**
+**Built by Himal Badu**
 
 [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/himal-badu)
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github)](https://github.com/Himal-Badu)
-[![Email](https://img.shields.io/badge/-Email-D14836?style=flat&logo=gmail)](mailto:himalbaduhimalbadu@gmail.com)
 
-*Building the future of AI, one prediction at a time.*
+*Building the future of AI prediction systems.*
 
 ---
 

@@ -2,6 +2,11 @@
 Integration module - Combines LLM with PoP layer.
 Implements the safety guard: only adjusts if proven better.
 Includes debugger for full observability.
+
+Supports three model types via config:
+    - "distributional": PoP v1 (simple features, fast)
+    - "contextual": PoP v2 (residual blocks, expanded features)
+    - "fusion": Both specialists combined (best accuracy)
 """
 import torch
 import numpy as np
@@ -11,10 +16,15 @@ import logging
 
 from .llm_base import LLMBase, create_llm
 from .pop_layer_llm import PoPLayerLLM, create_pop_llm
+from .pop_v2 import PoPLayerLLMV2, create_pop_v2
+from .pop_fusion import PoPFusion, FusionConfig, create_pop_fusion
 from .debugger import PoPDebugger
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Valid model types
+MODEL_TYPES = ("distributional", "contextual", "fusion")
 
 
 @dataclass
@@ -32,11 +42,49 @@ class PredictionResult:
     final_prob: float
     correction_applied: bool
     mode: str  # "passive" (warn only) or "active" (override)
+    model_type: str = "distributional"  # which specialist produced the result
+
+
+def _create_pop_layer(
+    model_type: str,
+    vocab_size: int,
+    device: str,
+    fusion_config: Optional[FusionConfig] = None,
+) -> Any:
+    """
+    Factory: create the right PoP specialist or fusion layer.
+    
+    Args:
+        model_type: "distributional", "contextual", or "fusion"
+        vocab_size: LLM vocabulary size
+        device: torch device string
+        fusion_config: Optional FusionConfig (only used when model_type="fusion")
+    
+    Returns:
+        PoPLayerLLM, PoPLayerLLMV2, or PoPFusion instance
+    """
+    if model_type == "distributional":
+        return create_pop_llm(vocab_size=vocab_size, device=device)
+    elif model_type == "contextual":
+        return create_pop_v2(vocab_size=vocab_size, device=device)
+    elif model_type == "fusion":
+        config = fusion_config or FusionConfig()
+        return create_pop_fusion(vocab_size=vocab_size, device=device, config=config)
+    else:
+        raise ValueError(
+            f"Unknown model_type '{model_type}'. "
+            f"Valid options: {MODEL_TYPES}"
+        )
 
 
 class PoPIntegration:
     """
     Integration of LLM + PoP layer with safety guard.
+    
+    Supports three model types:
+    - "distributional" (default): PoP v1 — simple features, fast inference
+    - "contextual": PoP v2 — residual blocks, expanded feature set, better accuracy
+    - "fusion": Combines both specialists for best results
     
     Modes:
     - "passive": PoP warns but never overrides LLM (log-only)
@@ -54,7 +102,9 @@ class PoPIntegration:
         debug: bool = True,
         mode: str = "active",
         error_threshold: float = 0.5,
-        top_k_search: int = 20
+        top_k_search: int = 20,
+        model_type: str = "distributional",
+        fusion_config: Optional[FusionConfig] = None,
     ):
         """
         Args:
@@ -64,20 +114,34 @@ class PoPIntegration:
             mode: "passive" (warn only) or "active" (override)
             error_threshold: PoP error_magnitude above this triggers correction
             top_k_search: How many tokens to search for alternatives
+            model_type: "distributional", "contextual", or "fusion"
+            fusion_config: Configuration for fusion layer (only used when model_type="fusion")
         """
+        if model_type not in MODEL_TYPES:
+            raise ValueError(
+                f"Unknown model_type '{model_type}'. "
+                f"Valid options: {MODEL_TYPES}"
+            )
+        
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.mode = mode
         self.error_threshold = error_threshold
         self.top_k_search = top_k_search
-        logger.info(f"Initializing PoP Integration on {self.device} | mode={mode}")
+        self.model_type = model_type
+        logger.info(
+            f"Initializing PoP Integration on {self.device} | "
+            f"mode={mode} | model_type={model_type}"
+        )
         
         # Load LLM
         self.llm = create_llm(llm_model_name, self.device)
         
-        # Create PoP layer
-        self.pop = create_pop_llm(
+        # Create PoP layer via factory
+        self.pop = _create_pop_layer(
+            model_type=model_type,
             vocab_size=self.llm.vocab_size,
-            device=self.device
+            device=self.device,
+            fusion_config=fusion_config,
         )
         
         # Debugger
@@ -86,7 +150,7 @@ class PoPIntegration:
         # Tracking
         self.prediction_history: List[PredictionResult] = []
         self.correction_history: List[Dict[str, Any]] = []
-        
+    
     def predict(
         self,
         text: str,
@@ -176,7 +240,8 @@ class PoPIntegration:
             final_token=final_token,
             final_prob=final_prob,
             correction_applied=correction_applied,
-            mode=self.mode
+            mode=self.mode,
+            model_type=self.model_type,
         )
         
         self.prediction_history.append(result)
@@ -244,6 +309,12 @@ class PoPIntegration:
                 "improvement": correct_prob - pred_prob
             })
         
+        # Normalize loss output across specialist types
+        if isinstance(loss, dict):
+            loss_val = loss.get("loss", loss.get("total", 0.0))
+        else:
+            loss_val = float(loss)
+        
         return {
             "predicted_token": predicted_token,
             "correct_token": correct_token,
@@ -251,7 +322,8 @@ class PoPIntegration:
             "error_magnitude": error_magnitude,
             "confidence": confidence,
             "error_direction": error_direction,
-            "loss": loss["loss"]
+            "loss": loss_val,
+            "model_type": self.model_type,
         }
     
     def train_batch(
@@ -299,6 +371,7 @@ class PoPIntegration:
             "status": "trained",
             "epochs": epochs,
             "examples": len(examples),
+            "model_type": self.model_type,
             "history": history
         }
     
@@ -311,25 +384,36 @@ class PoPIntegration:
         
         pop_result = self.pop.predict(logits.unsqueeze(0), probs.unsqueeze(0))
         
-        return {
+        analysis = {
             "text": text,
+            "model_type": self.model_type,
             "top_predictions": [
                 {"token": t, "prob": p} 
                 for t, p in zip(llm_result["top_tokens"][:5], llm_result["top_probs"][:5])
             ],
-            "pop_analysis": pop_result
+            "pop_analysis": pop_result,
         }
+        
+        # Include specialist breakdown for fusion mode
+        if self.model_type == "fusion" and "specialists" in pop_result:
+            analysis["specialist_breakdown"] = pop_result["specialists"]
+        
+        return analysis
     
     def get_statistics(self) -> Dict[str, Any]:
         """Get system statistics."""
         total = len(self.prediction_history)
         corrections = sum(1 for p in self.prediction_history if p.correction_applied)
         
+        # Get pop params safely regardless of specialist type
+        pop_params = self.pop.get_params()
+        
         return {
             "total_predictions": total,
             "corrections_applied": corrections,
             "correction_rate": corrections / total if total > 0 else 0,
-            "pop_trained": self.pop.is_trained,
+            "model_type": self.model_type,
+            "pop_params": pop_params,
             "llm_loaded": self.llm.is_loaded,
             "debugger_metrics": self.debugger.get_metrics()
         }
@@ -345,14 +429,38 @@ def create_pop_system(
     debug: bool = True,
     mode: str = "active",
     error_threshold: float = 0.5,
-    top_k_search: int = 20
+    top_k_search: int = 20,
+    model_type: str = "distributional",
+    fusion_config: Optional[FusionConfig] = None,
 ) -> PoPIntegration:
-    """Factory function to create a complete PoP system."""
+    """
+    Factory function to create a complete PoP system.
+    
+    Args:
+        llm_model_name: HuggingFace model name
+        device: 'cpu' or 'cuda'
+        debug: Enable debugger
+        mode: "passive" or "active"
+        error_threshold: Correction trigger threshold
+        top_k_search: Tokens to search for alternatives
+        model_type: "distributional", "contextual", or "fusion"
+        fusion_config: Config for fusion mode
+    
+    Returns:
+        Configured PoPIntegration instance
+    
+    Backward compatibility:
+        Calling with only the original parameters works identically:
+            create_pop_system("distilgpt2", device="cpu", mode="active")
+        New model_type defaults to "distributional" (same as v1 behavior).
+    """
     return PoPIntegration(
         llm_model_name=llm_model_name,
         device=device,
         debug=debug,
         mode=mode,
         error_threshold=error_threshold,
-        top_k_search=top_k_search
+        top_k_search=top_k_search,
+        model_type=model_type,
+        fusion_config=fusion_config,
     )
