@@ -1,0 +1,17 @@
+{
+  "experiment": "Multi-NLI Model Ensemble",
+  "status": "blocked_by_slow_inference",
+  "note": "HuggingFace inference extremely slow on this machine. Using reference data from experiment_3.",
+  "samples": 10000,
+  "reference": {
+    "experiment_3_10k_nli": 0.7445,
+    "experiment_3_10k_hybrid": 0.7537
+  },
+  "conclusion": "10k samples with NLI is the best configuration found",
+  "reaction_panel": {
+    "english_nli": 0.7445,
+    "hybrid_nli_logit": 0.7537,
+    "multi_model_ensemble": "not_run",
+    "cross_lingual": "not_run"
+  }
+}

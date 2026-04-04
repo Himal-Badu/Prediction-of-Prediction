@@ -4,3 +4,9 @@ transformers
 numpy
 pandas
 scikit-learn
+
+# API
+fastapi
+uvicorn
+pydantic
+websockets

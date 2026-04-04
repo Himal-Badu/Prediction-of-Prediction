@@ -1,0 +1,39 @@
+{
+  "experiment": "Ensemble NLI (Simplified)",
+  "max_samples": 400,
+  "semantic_only": {
+    "auc": 0.5374040920716112
+  },
+  "nli_only": {
+    "auc": 0.6093350383631714
+  },
+  "ensemble_prob_avg": {
+    "accuracy": 0.6375,
+    "precision": 0.5862068965517241,
+    "recall": 0.5,
+    "f1": 0.5396825396825397,
+    "auc": 0.6176470588235294
+  },
+  "full_hybrid": {
+    "accuracy": 0.6125,
+    "precision": 0.5483870967741935,
+    "recall": 0.5,
+    "f1": 0.5230769230769231,
+    "auc": 0.6208439897698209
+  },
+  "feature_importance": {
+    "cos_sim": 0.06367425161853577,
+    "euclidean": 0.08287832227172097,
+    "manhattan": 0.0737751557742263,
+    "entailment": 0.1995610195881262,
+    "contradiction": 0.27890556548643297,
+    "neutral": 0.3012056852609577
+  },
+  "comparison": {
+    "nli_only_ref": 0.716,
+    "semantic_only": 0.5374040920716112,
+    "nli_only": 0.6093350383631714,
+    "ensemble": 0.6176470588235294,
+    "full_hybrid": 0.6208439897698209
+  }
+}

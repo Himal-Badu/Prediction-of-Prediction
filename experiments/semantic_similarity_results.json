@@ -1,0 +1,37 @@
+{
+  "experiment": "Semantic Similarity",
+  "max_samples": 400,
+  "semantic_similarity_only": {
+    "accuracy": 0.6125,
+    "precision": 0.5555555555555556,
+    "recall": 0.4411764705882353,
+    "f1": 0.4918032786885246,
+    "auc": 0.5767263427109974
+  },
+  "nli_only": {
+    "accuracy": 0.6125,
+    "precision": 0.5483870967741935,
+    "recall": 0.5,
+    "f1": 0.5230769230769231,
+    "auc": 0.6093350383631714
+  },
+  "hybrid_sim_nli": {
+    "accuracy": 0.575,
+    "precision": 0.5,
+    "recall": 0.5294117647058824,
+    "f1": 0.5142857142857142,
+    "auc": 0.6010230179028133
+  },
+  "feature_importance": {
+    "cos_sim": 0.19181780326130227,
+    "entailment": 0.21403134436886467,
+    "contradiction": 0.3051490438721976,
+    "neutral": 0.2890018084976355
+  },
+  "comparison": {
+    "consistency_only": 0.526,
+    "nli_only_ref": 0.716,
+    "semantic_sim_only": 0.5767263427109974,
+    "hybrid_sim_nli": 0.6010230179028133
+  }
+}

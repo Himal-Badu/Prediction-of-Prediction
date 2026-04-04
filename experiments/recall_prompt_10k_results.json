@@ -1,0 +1,39 @@
+{
+  "experiment": "Recall Prompt Method - 10k Samples",
+  "status": "blocked_by_hf_rate_limit",
+  "note": "Could not run due to HuggingFace rate limiting. Using existing experiment_3 data as baseline.",
+  "samples": 10000,
+  "model": "cross-encoder/nli-MiniLM2-L6-H768",
+  "results": {
+    "standard": {
+      "auc": 0.7445,
+      "note": "Baseline NLI from experiment_3"
+    },
+    "verify": {
+      "auc": "not_run",
+      "note": "Could not test due to rate limit"
+    },
+    "recall": {
+      "auc": "not_run",
+      "note": "Could not test due to rate limit"
+    },
+    "ensemble": {
+      "auc": "not_run",
+      "note": "Could not test due to rate limit"
+    }
+  },
+  "reference": {
+    "experiment_3_10k": {
+      "logit_auc": 0.702,
+      "nli_auc": 0.745,
+      "hybrid_auc": 0.754
+    }
+  },
+  "how_to_run": "Set HF_TOKEN environment variable: export HF_TOKEN=your_token_here",
+  "reaction_panel": {
+    "note": "experiment_3 shows 10k is the sweet spot",
+    "nli_10k": 0.745,
+    "hybrid_10k": 0.754,
+    "conclusion": "Use 10k samples with NLI or hybrid for best results"
+  }
+}

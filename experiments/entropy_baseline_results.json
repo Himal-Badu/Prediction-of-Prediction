@@ -1,0 +1,37 @@
+{
+  "experiment": "entropy_baseline",
+  "data": {
+    "samples": 4114,
+    "features": 24,
+    "n_correct": 817,
+    "n_errors": 3297
+  },
+  "entropy_baseline": {
+    "precision": 0.8037359263050153,
+    "recall": 0.9526842584167425,
+    "f1": 0.8718945176960444,
+    "accuracy": 0.7756441419543024,
+    "auc": 0.5338082281692975,
+    "threshold": 3.912144899368286
+  },
+  "best_single_feature": {
+    "index": 7,
+    "precision": 0.8041975940619401,
+    "recall": 0.9529875644525326,
+    "f1": 0.8722931704608551,
+    "accuracy": 0.7763733592610598
+  },
+  "mlp_24_features": {
+    "precision": 0.8014098914126407,
+    "recall": 1.0,
+    "f1": 0.8897584026869033,
+    "accuracy": 0.8014098914126407,
+    "auc": 0.4075332840390127,
+    "precision_std": 0.0005628317138497259,
+    "recall_std": 0.0,
+    "f1_std": 0.0003469200091080199
+  },
+  "f1_gain_vs_entropy": 0.01786388499085889,
+  "f1_gain_vs_best_single": 0.017465232226048233,
+  "verdict": "MARGINAL"
+}

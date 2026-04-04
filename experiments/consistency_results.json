@@ -1,0 +1,52 @@
+{
+  "experiment": "Multi-Sample Consistency",
+  "n_samples": 5,
+  "max_samples": 200,
+  "consistency_only": {
+    "accuracy": 0.6,
+    "precision": 0.5555555555555556,
+    "recall": 0.29411764705882354,
+    "f1": 0.38461538461538464,
+    "auc": 0.5255754475703325,
+    "features": [
+      "mean_sim",
+      "variance",
+      "min_sim",
+      "agreement_rate",
+      "nli_entailment"
+    ]
+  },
+  "hybrid_consistency_logits": {
+    "accuracy": 0.6,
+    "precision": 0.5555555555555556,
+    "recall": 0.29411764705882354,
+    "f1": 0.38461538461538464,
+    "auc": 0.5255754475703325,
+    "n_features": 14
+  },
+  "feature_importance": {
+    "consistency": {
+      "mean_sim": 0.0380666562483279,
+      "variance": 0.0,
+      "min_sim": 0.0019982389532922874,
+      "agreement_rate": 0.0,
+      "nli_entailment": 0.9599351047983797
+    },
+    "hybrid": {
+      "mean_sim": 0.02496244639748939,
+      "variance": 0.0,
+      "min_sim": 0.015102448804130732,
+      "agreement_rate": 0.0,
+      "nli_entailment": 0.95993510479838,
+      "logit_0": 0.0,
+      "logit_1": 0.0,
+      "logit_2": 0.0,
+      "logit_3": 0.0,
+      "logit_4": 0.0,
+      "logit_5": 0.0,
+      "logit_6": 0.0,
+      "logit_7": 0.0,
+      "logit_8": 0.0
+    }
+  }
+}
