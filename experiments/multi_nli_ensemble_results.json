@@ -1,0 +1,27 @@
+{
+  "experiment": "Multi-NLI Model Ensemble (Cross-Lingual)",
+  "samples": 500,
+  "models": [
+    "minilm",
+    "deberta-small"
+  ],
+  "results": {
+    "minilm": {
+      "auc": 0.6305
+    },
+    "deberta_small": {
+      "auc": 0.7116
+    },
+    "hybrid_minilm_deberta": {
+      "auc": 0.6678,
+      "accuracy": 0.65,
+      "precision": 0.6047,
+      "recall": 0.5909,
+      "f1": 0.5977
+    }
+  },
+  "reference": {
+    "10k_minilm": 0.7445,
+    "10k_hybrid": 0.7537
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "experiment": "Recall Prompt Method",
+  "status": "in_progress",
+  "note": "Limited testing due to slow inference",
+  "samples": 200,
+  "prompts_tested": ["standard", "verify", "recall"],
+  "results": {
+    "standard": {"auc": 0.72},
+    "verify": {"auc": 0.69},
+    "recall": {"auc": 0.71},
+    "ensemble": {"auc": 0.70}
+  },
+  "reference_10k": 0.7445,
+  "conclusion": "Standard NLI at 10k samples remains the best (0.7445)"
+}
