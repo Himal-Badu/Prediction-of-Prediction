@@ -1,0 +1,17 @@
+{
+  "experiment": "Recall Prompt Method (Simulated)",
+  "note": "Could not run due to HuggingFace rate limiting. Using existing experiment_3 data as baseline.",
+  "baseline_results_from_experiment_3": {
+    "1000": {"nli_auc": 0.677, "logit_auc": 0.702, "hybrid_auc": 0.709},
+    "5000": {"nli_auc": 0.735, "logit_auc": 0.686, "hybrid_auc": 0.740},
+    "10000": {"nli_auc": 0.745, "logit_auc": 0.702, "hybrid_auc": 0.754},
+    "50000": {"nli_auc": 0.732, "logit_auc": 0.698, "hybrid_auc": 0.743},
+    "100000": {"nli_auc": 0.731, "logit_auc": 0.698, "hybrid_auc": 0.742}
+  },
+  "conclusion": {
+    "best_nli_at": "10k samples with AUC 0.745",
+    "best_hybrid_at": "10k samples with AUC 0.754",
+    "sweet_spot": "10k-50k samples",
+    "recall_prompt_status": "Not tested due to API rate limits"
+  }
+}
