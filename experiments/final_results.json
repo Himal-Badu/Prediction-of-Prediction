@@ -1,0 +1,34 @@
+{
+  "best_method": "NLI_CosSim_Length",
+  "best_auc": 0.7646,
+  "cv_mean": 0.7552,
+  "cv_std": 0.0088,
+  "range": "0.7422 - 0.7646",
+  "all_methods": {
+    "NLI_only": {
+      "mean": 0.6738,
+      "std": 0.0499
+    },
+    "NLI_CosSim": {
+      "mean": 0.7018,
+      "std": 0.0632
+    },
+    "NLI_Length": {
+      "mean": 0.7333,
+      "std": 0.0399
+    },
+    "NLI_CosSim_Length": {
+      "mean": 0.7646,
+      "std": 0.0499
+    },
+    "NLI_Attention": {
+      "mean": 0.6729,
+      "std": 0.0497
+    },
+    "All_Features": {
+      "mean": 0.7643,
+      "std": 0.0491
+    }
+  },
+  "attention_verdict": "NOT USEFUL"
+}
