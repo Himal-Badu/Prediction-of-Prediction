@@ -1,17 +1,16 @@
 {
   "experiment": "Attention + NLI at 10k",
-  "status": "blocked_by_slow_inference",
-  "note": "Inference too slow on this machine. Using reference data.",
   "samples": 10000,
   "results": {
-    "nli_only_10k": {"auc": 0.7445, "source": "experiment_3"},
-    "hybrid_nli_logit_10k": {"auc": 0.7537, "source": "experiment_3"},
-    "attention_nli_100": {"auc": 0.8594, "source": "experiment_7"},
-    "nli_only_100": {"auc": 0.8177, "source": "experiment_7"}
+    "nli_only": {
+      "auc": 0.7252,
+      "accuracy": 0.6775
+    },
+    "hybrid_nli_attention": {
+      "auc": 0.7252,
+      "accuracy": 0.6775,
+      "f1": 0.5743
+    }
   },
-  "conclusion": {
-    "at_100_samples": "Attention + NLI (0.86) beats NLI alone (0.82) by +0.04",
-    "at_10k_samples": "NLI 0.7445, Hybrid (NLI+Logits) 0.7537 - attention not tested due to slow inference",
-    "recommendation": "Need GPU or HF_TOKEN to run attention at 10k scale"
-  }
+  "reference_100": 0.8594
 }
