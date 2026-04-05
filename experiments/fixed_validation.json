@@ -1,0 +1,10 @@
+{
+  "experiment": "fixed_validation_no_leakage",
+  "samples": 800,
+  "unique_samples": true,
+  "conservative_split": 0.71,
+  "split_mean": 0.7242,
+  "cv_mean": 0.7646,
+  "cv_std": 0.0499,
+  "range": "0.7056 - 0.8359"
+}
