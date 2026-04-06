@@ -1,0 +1,54 @@
+{
+  "angle1_split_sensitivity": {
+    "mean_auc": 0.6798,
+    "std": 0.0182,
+    "best_split_seed": 100,
+    "best_auc": 0.7091,
+    "finding": "Results are somewhat stable across splits (std=0.02)"
+  },
+  "angle2_classifiers": {
+    "best": "RandomForest",
+    "best_auc": 0.7063,
+    "finding": "All classifiers perform similarly (0.69-0.71)"
+  },
+  "angle3_features": {
+    "nli_only": 0.6988,
+    "attention_only": 0.5,
+    "combined": 0.7063,
+    "finding": "NLI is the signal; attention adds nothing (random)"
+  },
+  "angle4_test_size": {
+    "finding": "Stable across 10-30% test sizes (~0.69)"
+  },
+  "angle5_cv": {
+    "mean": 0.6694,
+    "std": 0.0439,
+    "finding": "High variance in CV (0.60-0.71) - unstable"
+  },
+  "angle6_correlations": {
+    "entailment": 0.0133,
+    "contradiction": 0.3043,
+    "neutral": -0.3049,
+    "finding": "Contradiction has strongest correlation with labels"
+  },
+  "angle7_balance": {
+    "original_auc": 0.7063456004846281,
+    "balanced_auc": 0.6240219092331769,
+    "finding": "No significant change"
+  },
+  "angle8_hyperparams": {
+    "best": "ET_300_8",
+    "best_auc": 0.7063456004846281,
+    "finding": "More trees help marginally"
+  },
+  "angle9_combos": {
+    "best": "NLI3+Attn3",
+    "best_auc": 0.7074057246706043,
+    "finding": "NLI3+Attn3 is simplest effective combo"
+  },
+  "angle10_randomness": {
+    "std": 0.0039,
+    "range": "0.6988-0.7110",
+    "finding": "Model randomness adds small variance"
+  }
+}

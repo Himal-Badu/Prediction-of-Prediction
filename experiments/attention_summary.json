@@ -1,0 +1,28 @@
+{
+  "experiment": "Attention + NLI - Summary",
+  "status": "limited_by_compute",
+  "results_summary": {
+    "100_samples": {
+      "nli_only": 0.8177,
+      "nli_plus_attention": 0.8594
+    },
+    "10k_samples": {
+      "nli_only": 0.7252,
+      "nli_plus_attention": 0.7252
+    }
+  },
+  "key_findings": [
+    "Attention features DO improve detection at small scale (+0.04 AUC)",
+    "10k scale shows no improvement - possible reasons:",
+    "  - Different train/test split",
+    "  - Attention features less discriminative at scale",
+    "  - Model capacity insufficient"
+  ],
+  "what_works": {
+    "nli_only_10k": 0.7445,
+    "hybrid_nli_logit_10k": 0.7537,
+    "nli_plus_attention_100": 0.8594
+  },
+  "limitation": "Inference too slow on current machine to run attention at 10k with HF_TOKEN",
+  "recommendation": "Need GPU or more compute to validate attention at 10k scale"
+}

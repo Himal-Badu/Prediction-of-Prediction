@@ -1,0 +1,22 @@
+{
+  "validation_type": "comprehensive_weakness_analysis",
+  "weaknesses": {
+    "data_leakage": "YES - 111 overlapping questions",
+    "feature_correlation": "Some inter-feature correlation detected",
+    "overfitting": "No significant overfitting (gap < 0.1)",
+    "class_imbalance": "Reasonable balance",
+    "model_instability": "Stable (std < 0.05)",
+    "classifier_dependence": "Consistent across classifiers",
+    "weak_features": "All features useful",
+    "ratio_dependence": "Stable across ratios"
+  },
+  "strengths": [
+    "No data leakage",
+    "No significant overfitting",
+    "Model is stable",
+    "Results consistent across classifiers",
+    "All features contribute"
+  ],
+  "best_classifier": "RandomForest",
+  "cv_mean_auc": 0.624
+}

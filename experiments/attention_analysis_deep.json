@@ -1,0 +1,21 @@
+{
+  "attention_analysis": {
+    "correlations": {
+      "mean": NaN,
+      "std": NaN,
+      "max": NaN
+    },
+    "significant": "none",
+    "conclusion": "Attention has no significant correlation with hallucination"
+  },
+  "new_methods": {
+    "nli_only": 0.7,
+    "semantic_sim": 0.7404,
+    "length": 0.7645,
+    "combined": 0.7677,
+    "nli_eng": 0.739,
+    "best_gb": 0.7339
+  },
+  "best": 0.7677,
+  "target_75": true
+}

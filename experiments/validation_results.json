@@ -1,0 +1,10 @@
+{
+  "split_test_mean": 0.7563,
+  "split_test_std": 0.0349,
+  "cv_mean": 0.7437,
+  "cv_std": 0.0356,
+  "min_auc": 0.6867,
+  "max_auc": 0.8016,
+  "consistent_above_70": false,
+  "consistent_above_75": true
+}

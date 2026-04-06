@@ -1,0 +1,16 @@
+{
+  "experiment": "Attention + NLI at 10k",
+  "samples": 10000,
+  "results": {
+    "nli_only": {
+      "auc": 0.7252,
+      "accuracy": 0.6775
+    },
+    "hybrid_nli_attention": {
+      "auc": 0.7252,
+      "accuracy": 0.6775,
+      "f1": 0.5743
+    }
+  },
+  "reference_100": 0.8594
+}
