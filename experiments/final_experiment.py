@@ -68,7 +68,9 @@ probs = torch.softmax(torch.tensor(scores), dim=-1).numpy()
 # Semantic similarity
 q_emb = attn_model.encode(questions, show_progress_bar=False, batch_size=32)
 c_emb = attn_model.encode(choices, show_progress_bar=False, batch_size=32)
-cos_sim = np.sum(q_emb * c_emb, axis=1) / (np.linalg.norm(q_emb, axis=1) * np.linalg.norm(c_emb, axis=1) + 1e-10)
+forward_sim = np.sum(q_emb * c_emb, axis=1) / (np.linalg.norm(q_emb, axis=1) * np.linalg.norm(c_emb, axis=1) + 1e-10)
+reverse_sim = np.sum(c_emb * q_emb, axis=1) / (np.linalg.norm(c_emb, axis=1) * np.linalg.norm(q_emb, axis=1) + 1e-10)
+asymmetry = np.abs(forward_sim - reverse_sim)
 
 # Length features
 q_len = np.array([len(q.split()) for q in questions])
@@ -84,9 +86,9 @@ print("="*60)
 
 feature_sets = {
     "NLI_only": probs,
-    "NLI_CosSim": np.column_stack([probs, cos_sim]),
+    "NLI_CosSim": np.column_stack([probs, forward_sim]),
     "NLI_Length": np.column_stack([probs, len_ratio, q_len, c_len]),
-    "NLI_CosSim_Length": np.column_stack([probs, cos_sim, len_ratio, q_len, c_len]),
+    "NLI_CosSim_Length": np.column_stack([probs, forward_sim, reverse_sim, asymmetry, len_ratio, q_len, c_len]),
 }
 
 # Also test attention one more time to confirm
@@ -102,7 +104,7 @@ def get_attn(q, c, m):
 
 attn_feats = np.array([get_attn(q,c,attn_model) for q,c in zip(questions,choices)])
 feature_sets["NLI_Attention"] = np.column_stack([probs, attn_feats])
-feature_sets["All_Features"] = np.column_stack([probs, cos_sim, len_ratio, q_len, c_len, attn_feats])
+feature_sets["All_Features"] = np.column_stack([probs, forward_sim, reverse_sim, asymmetry, len_ratio, q_len, c_len, attn_feats])
 
 results = {}
 
@@ -219,6 +221,8 @@ for name, res in sorted(results.items(), key=lambda x: -x[1]["mean"]):
     marker = " 👑 BEST" if name == best_name else ""
     attn_marker = " ⚠️" if "Attention" in name else ""
     print(f"  {name}: {res['mean']:.4f} (+/- {res['std']:.4f}){marker}{attn_marker}")
+    if name == "NLI_CosSim_Length":
+        print(f"      (using {X.shape[1]} features: NLI={probs.shape[1]}, CosSim=4, Length=3)")
 
 print(f"""
 FINDINGS:
