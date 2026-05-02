@@ -166,27 +166,55 @@ We conducted comprehensive validation to ensure reliable results:
 pop-repo/
 ├── pop/
 │   ├── core/
-│   │   ├── llm_base.py            # LLM integration (DistilGPT2)
-│   │   ├── pop_layer_llm.py      # PoP layer (meta-learning)
-│   │   ├── meta_ensemble.py      # Hierarchical meta-ensemble ✨ NEW
-│   │   ├── pop_fusion.py         # Unified integration layer ✨ UPDATED
-│   │   ├── correction_engine.py  # Smart correction
-│   │   └── ...
+│   │   ├── llm_base.py            # Base LLM layer
+│   │   ├── pop_layer_llm.py       # PoP v1 specialist
+│   │   ├── pop_v2.py              # PoP v2 specialist
+│   │   ├── pop_fusion.py          # ✅ PoPFusion (v1+v2) — CI/backward compat
+│   │   ├── integration.py         # Imports PoPFusion
+│   │   ├── meta_ensemble.py       # Meta-ensemble classifier ✅
+│   │   └── unified.py             # ✨ UnifiedPoP v2.0 (meta-ensemble system)
 │   └── __init__.py
 ├── experiments/
-│   ├── final_experiment.py        # Final validation (8 features) ✨ UPDATED
-│   ├── benchmark_meta_ensemble.py # Meta-ensemble benchmark ✨ NEW
-│   ├── final_unified_benchmark.py # Unified system test ✨ NEW
-│   ├── final_results.json        # Results summary (76.46% AUC)
-│   ├── benchmark_meta_results.json # Meta-ensemble results ✨ NEW
-│   ├── final_crosscheck.json     # Bug verification results ✨ NEW
-│   ├── multi_angle_analysis.json # Comprehensive testing
+│   ├── final_experiment.py        # Final validation (76.46% AUC)
+│   ├── benchmark_meta_ensemble.py # Meta-ensemble benchmark
+│   ├── final_unified_benchmark.py # Unified system test
+│   ├── final_results.json        # Results summary
+│   ├── benchmark_meta_results.json # Meta-ensemble results
+│   ├── final_crosscheck.json     # Bug verification results
 │   └── ...
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── METHODOLOGY.md
-│   └── BENCHMARKS.md
-├── tests/
+├── .github/workflows/
+│   ├── ci.yml                     # CI pipeline (lint, test, smoke)
+│   └── meta-ensemble.yml          # Meta-ensemble validation ✨
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### Version 1.0 (Stable - Production)
+
+```python
+from pop.core.pop_fusion import PoPFusion
+
+fusion = PoPFusion(vocab_size=50257)
+result = fusion.predict(logits, probs)
+```
+
+**Performance:** 75.52% → **76.46% AUC** ✅
+
+### Version 2.0 (Unified - Meta-Ensemble)
+
+```python
+from pop.core.unified import UnifiedPoP, create_unified_system
+
+system = create_unified_system(llm_model_name="distilgpt2", mode="meta")
+result = system.predict("The capital of France is London.")
+```
+
+**Expected:** 76.46% → **77%+ AUC** 🚀
+
+---
 ├── train_pop_v2.py
 ├── benchmark.py
 ├── requirements.txt
