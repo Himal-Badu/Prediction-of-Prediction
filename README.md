@@ -358,13 +358,6 @@ AGPL-3.0 License — see [LICENSE](LICENSE)
 | **PoP (Current)** | **76.46%** | **FREE** | **Free GPUs** ✅ |
 | PoP (Expected v2.0) | 77%+ | FREE | Free GPUs |
 
-### Use in Production
-
-- ✅ Ministry of Education (Nepal) - Under evaluation
-- ✅ Educational institutions - Ready for pilot
-- ✅ Research projects - Actively used
-
----
 
 ## Author
 
@@ -372,25 +365,17 @@ AGPL-3.0 License — see [LICENSE](LICENSE)
 
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github)](https://github.com/Himal-Badu)
 
-### Research Impact
 
-This work demonstrates that:
-1. High-accuracy hallucination detection is achievable without expensive commercial tools
-2. Open-source approaches can match or exceed proprietary methods
-3. Hierarchical meta-ensembles provide robust, interpretable solutions
-4. Free GPU infrastructure is sufficient for production deployment
 
 ---
 
 *Building AI safety tools for the next generation — FREE, OPEN-SOURCE, and ACCESSIBLE to all.* 🇳🇵✨
 
-> "If we can make AI safer for Nepali students with free tools, we can do it anywhere."
 
 ---
 
 ## Acknowledgments
 
-- **Ministry of Education, Nepal** - For supporting open-source AI safety research
 - **HuggingFace** - For Transformers and Sentence-Transformers libraries
 - **TruthfulQA** - For evaluation dataset and methodology
 - **Open-source community** - For continuous innovation and collaboration
