@@ -354,15 +354,15 @@ AGPL-3.0 License — see [LICENSE](LICENSE)
 
 | System | Accuracy | Cost | GPU Requirements |
 |--------|----------|------|------------------|
-| Commercial (GPT-4 guardrails) | ~85-90% | $50K+/year | Proprietary |
+| Commercial (proprietary) | ~85-90% | High | Proprietary |
 | **PoP (Current)** | **76.46%** | **FREE** | **Free GPUs** ✅ |
 | PoP (Expected v2.0) | 77%+ | FREE | Free GPUs |
 
 ### Use in Production
 
-- ✅ Ministry of Education (Nepal) - Under evaluation
 - ✅ Educational institutions - Ready for pilot
 - ✅ Research projects - Actively used
+- ✅ Open-source deployments - Active
 
 ---
 
@@ -372,25 +372,24 @@ AGPL-3.0 License — see [LICENSE](LICENSE)
 
 [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat&logo=github)](https://github.com/Himal-Badu)
 
-### Research Impact
+### Research Focus
 
 This work demonstrates that:
-1. High-accuracy hallucination detection is achievable without expensive commercial tools
-2. Open-source approaches can match or exceed proprietary methods
-3. Hierarchical meta-ensembles provide robust, interpretable solutions
-4. Free GPU infrastructure is sufficient for production deployment
+1. High-accuracy hallucination detection is achievable with open-source tools
+2. Hierarchical meta-ensembles provide robust, interpretable solutions
+3. Free GPU infrastructure is sufficient for production deployment
+4. AI safety research can advance without expensive proprietary systems
 
 ---
 
 *Building AI safety tools for the next generation — FREE, OPEN-SOURCE, and ACCESSIBLE to all.* 🇳🇵✨
 
-> "If we can make AI safer for Nepali students with free tools, we can do it anywhere."
+> "Making AI research accessible to everyone, everywhere."
 
 ---
 
 ## Acknowledgments
 
-- **Ministry of Education, Nepal** - For supporting open-source AI safety research
 - **HuggingFace** - For Transformers and Sentence-Transformers libraries
 - **TruthfulQA** - For evaluation dataset and methodology
 - **Open-source community** - For continuous innovation and collaboration
