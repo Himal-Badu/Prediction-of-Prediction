@@ -1,8 +1,7 @@
 # PoP Roadmap — Solve Hallucination, Then Scale
 
 > **The only question that matters:** Does PoP actually solve the hallucination problem?
-> **If yes:** Fund it, build an AI lab, change the world.
-> **If no:** Find out fast, iterate, prove it.
+> **If yes:** Keep building. If **no:** Find out fast, iterate, prove it.
 
 ---
 
@@ -31,11 +30,11 @@
 ---
 
 ## Phase 2: Scale It (May → June)
-**Goal:** Retrain with more parameters, test on a harder model.
+**Goal:** Retrain with more features, test on a harder model.
 
 ### Step 1: Scale PoP Architecture
-- Current: 400K params, 24 features, residual blocks
-- Target: 2-5M params, deeper architecture
+- Current: 9 features, 3 branch classifiers + meta-ensemble
+- Target: richer feature set (model internals, attention patterns, deeper layers)
 - Add: multi-depth feature extraction (read intermediate layers, not just final logits)
 - Add: sequence-level detection (not just per-token, but "this whole sentence is wrong")
 
@@ -47,7 +46,7 @@
 ### Step 3: Test on GPT-4 via API
 - Limited to final-logit features (no internal access)
 - This is the hardest test: can PoP work with only what the API gives you?
-- Even 70% F1 here would be a massive result
+- Even 70% F1 here would be a significant result
 
 **Exit criteria:** >80% F1 on Llama-3-8B. GPT-4 results are bonus, not required.
 
@@ -59,7 +58,7 @@
 ### Step 1: arXiv Paper
 - Title: "PoP: Meta-Learning for Real-Time Hallucination Detection"
 - Sections: Method, Experiments (TruthfulQA, HaluEval, Llama-3), Results, Ablations
-- Key claim: "400K-param model catches 85% of hallucinations in a single pass at zero additional cost"
+- Key finding: "NLI + semantic features achieve 76.46% AUC on hallucination detection with a lightweight meta-ensemble"
 - Publish on arXiv regardless. The proof speaks for itself.
 
 ### Step 2: Open-Source Everything
@@ -68,55 +67,43 @@
 - Let the code do the talking
 
 ### Step 3: Share
-- Twitter/X: results, demos, "we built this"
-- Hacker News, Reddit ML, AI Twitter
-- Not marketing — just showing what it does
+- Share results, demos, and what was learned
+- Not marketing — just showing what it does and what it doesn't do
 
 **Exit criteria:** Paper on arXiv, code public, community can reproduce results.
 
 ---
 
-## Phase 4: Fund It (August → September)
-**Goal:** Raise funding to build the AI lab.
+## Phase 4: Collaborate (August → September)
+**Goal:** Find collaborators and resources to expand the research.
 
-### The Pitch (30 seconds)
-> "We built a 400K parameter model that catches LLM hallucinations with 85% accuracy. Single pass. Zero additional cost. Works with any LLM. Here's the paper. Here's the code. Here's the benchmark. We need funding to scale this to production models and build the reliability layer for AI."
+- Connect with AI safety and reliability researchers
+- Explore academic partnerships (universities, research labs)
+- Apply for research grants (NSF, AI safety foundations, Google Research)
+- Look for 1-2 collaborators who complement your skills
 
-### What You Need
-- Proof from Phase 1-3 (benchmarks, paper, working code)
-- Clear ask: $500K-$1.5M pre-seed
-- Use of funds: GPU compute, hire 1-2 engineers, expand to more model families
-
-### Who to Talk To
-- AI-focused VCs (if you want to go VC route)
-- AI safety orgs (if aligned with their mission)
-- Strategic acquirers who need hallucination detection (enterprise AI companies)
-
-### What NOT to Do Yet
-- Don't build a product
-- Don't hire a team
-- Don't worry about revenue
-- Just prove the science, then fund the science
-
-**Exit criteria:** Funding commitment or clear interest from investors.
+**What NOT to do yet:**
+- ❌ Don't build a product
+- ❌ Don't hire a team
+- ❌ Don't worry about revenue
+- Just prove the science, then find the right people to scale it
 
 ---
 
-## Phase 5: Build the Lab (Post-Funding)
-**Goal:** Expand PoP into a real AI research lab.
+## Phase 5: Expand the Research (Post-Collaboration)
+**Goal:** Broaden PoP into a general-purpose reliability layer.
 
-### With Funding, You Can:
+### Research Directions
 - Train on more model families (Llama-70B, Mistral, Mixtral, Claude)
-- Hire researchers to explore: multimodal PoP, online learning, adversarial robustness
-- Build the infrastructure: training clusters, evaluation pipelines
-- Publish at NeurIPS, ICML, ACL
-- Eventually: build the reliability layer that every LLM uses
+- Explore multimodal hallucination detection (text + images)
+- Investigate adversarial robustness (can attackers fool PoP?)
+- Build the infrastructure: evaluation pipelines, continuous benchmarks
+- Publish at NeurIPS, ICML, ACL workshops
 
-### The Lab Vision
-- **Not** a product company (at first)
-- **An AI research lab** focused on making LLMs reliable
-- PoP is the first project. More will come.
-- Think: Anthropic's safety focus, but for reliability/accuracy
+### The Long-Term Vision
+- An open research effort focused on making LLMs reliable
+- PoP is the first project. More detection methods will follow.
+- Think: reliability-first AI research, open and reproducible
 
 ---
 
@@ -127,27 +114,14 @@
 | **1. Prove It** | 🟡 In Progress | v2: 84.6% F1 on synthetic. Need real benchmarks. |
 | **2. Scale It** | ⬜ Not Started | Waiting on Phase 1 results |
 | **3. Publish It** | ⬜ Not Started | Waiting on Phase 2 results |
-| **4. Fund It** | ⬜ Not Started | Waiting on Phase 3 proof |
-| **5. Build Lab** | ⬜ Not Started | Waiting on Phase 4 funding |
+| **4. Collaborate** | ⬜ Not Started | Waiting on Phase 3 proof |
+| **5. Expand Research** | ⬜ Not Started | Waiting on collaborators |
 
 ### Immediate Next Action
 **Run PoP on TruthfulQA.** This is the first real test. Everything depends on this result.
 
 ---
 
-## What We're NOT Doing Right Now
-
-- ❌ Building a product
-- ❌ Designing APIs
-- ❌ Pricing models
-- ❌ Community strategy
-- ❌ Marketing
-- ❌ Hiring
-
-All of that comes AFTER we prove the science works. First: proof. Then: everything else.
-
----
-
-*Updated: March 30, 2026*
+*Updated: May 2026*
 *Owner: Himal Badu*
 *Next review: After TruthfulQA results*
